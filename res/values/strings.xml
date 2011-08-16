@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, ContactManagerActivity!</string>
-    <string name="app_name">ContactManager</string>
+    <string name="main">ContactManager main Activity!</string>
+    <string name="app_name">SNDA联系人管理器</string>
 </resources>
