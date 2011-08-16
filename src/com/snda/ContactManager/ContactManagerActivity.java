@@ -1,3 +1,15 @@
+/**
+ * Copyright (C) 2011, Shanda Corporation. All rights reserved.
+ *
+ * @file: ContactManagerActivity.java
+ * 
+ * @author: tangyaguang@snda.com 018386
+ *
+ * @date: 2011-08-16
+ *
+ * @doc:  ContactManager main Activity
+ */
+
 package com.snda.ContactManager;
 
 import android.app.Activity;
