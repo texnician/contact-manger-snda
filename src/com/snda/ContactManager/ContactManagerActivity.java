@@ -1,15 +1,14 @@
 /**
- * Copyright (C) 2011, Shanda Corporation. All rights reserved.
+ * Copyright (C)2011, Shanda Corporation. All rights reserved.
  *
  * @file: ContactManagerActivity.java
- * 
+ *
  * @author: tangyaguang@snda.com 018386
  *
- * @date: 2011-08-16
+ * @date: 2011-08-16 15:57:21
  *
- * @doc:  ContactManager main Activity
+ * @doc: ContactManager main Activity
  */
-
 
 package com.snda.ContactManager;
 
