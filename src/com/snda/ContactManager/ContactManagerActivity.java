@@ -10,6 +10,7 @@
  * @doc:  ContactManager main Activity
  */
 
+
 package com.snda.ContactManager;
 
 import android.app.Activity;
