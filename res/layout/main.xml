@@ -9,4 +9,9 @@
     android:layout_height="wrap_content" 
     android:text="@string/main"
     />
+<ListView android:id="@+id/contact_list"
+          android:layout_width="fill_parent"
+          android:layout_height="12px"
+          android:layout_weight="1"
+          android:drawSelectorOnTop="false"></ListView>
 </LinearLayout>

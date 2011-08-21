@@ -2,4 +2,19 @@
 <resources>
     <string name="main">ContactManager main Activity!</string>
     <string name="app_name">SNDA联系人管理器</string>
+    <string name="label_first_name">名字</string>
+    <string name="label_last_name">姓氏</string>
+    <string name="label_phone">电话</string>
+    <string name="label_email">邮件</string>
+    <string name="label_weibo">新浪微博</string>
+    <string name="label_qq">QQ</string>
+    <string name="label_msn">MSN</string>
+    <string name="label_organization">单位</string>
+    <string name="label_address">地址</string>
+    <string name="label_department">部门</string>
+    <string name="label_position">职务</string>
+    <string name="label_note">备注</string>
+
+    <string name="menu_add_contact">添加</string>
+    <string name="save">保存</string>
 </resources>
