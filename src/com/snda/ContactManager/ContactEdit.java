@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -24,6 +25,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.content.DialogInterface;
 
 public class ContactEdit extends Activity implements View.OnClickListener {
     private EditText first_name_et = null;
@@ -119,6 +121,31 @@ public class ContactEdit extends Activity implements View.OnClickListener {
     }
     
     // String SELECTION = RawContacts.CONTACT_ID + "=? OR " + RawContacts.CONTACT_ID + "=?";
+
+    /**
+     * <code>verifyForm</code> 校验表单数据合法性
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean verifyForm()
+    {
+        String first_name = first_name_et.getText().toString();
+        String last_name = last_name_et.getText().toString();
+        if (first_name.equals("") && last_name.equals("")) {
+            new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.error))
+                .setMessage(getString(R.string.dialog_null_contact_name))
+                .setPositiveButton(getString(R.string.Continue),
+                                   new android.content.DialogInterface.OnClickListener() {
+                                       public void onClick(DialogInterface dialog, int arg1) {
+                                           // 什么也不做，直接返回
+                                       }
+                                   })
+                .show();
+            return false;
+        }
+        return true;
+    }
     
     @Override
     public void onClick(View v) {
@@ -127,6 +154,12 @@ public class ContactEdit extends Activity implements View.OnClickListener {
     	switch (v.getId()) {
         case R.id.button_contacts_save:
             Log.i(Constants.APP_TAG, "Save Contact");
+            // 校验数据合法性，名字和姓氏不能全部为空
+            if (verifyForm() == false) {
+                Log.i(Constants.APP_TAG, "Invalid Contact Form");
+                return;
+            }
+            
             // 搜集UI上的数据
             String first_name = first_name_et.getText().toString();
             String last_name = last_name_et.getText().toString();
@@ -156,6 +189,7 @@ public class ContactEdit extends Activity implements View.OnClickListener {
             // 刷新列表?
             break;
         case R.id.button_contacts_cancel_edit:
+            Log.i(Constants.APP_TAG, "Cancel edit contact");
         	// 取消编辑
         	finish();
         	break;

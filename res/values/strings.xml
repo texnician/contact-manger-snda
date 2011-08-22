@@ -2,6 +2,7 @@
 <resources>
     <string name="main">ContactManager main Activity!</string>
     <string name="app_name">SNDA联系人管理器</string>
+    <string name="edit_contact">编辑联系人</string>
     <string name="label_first_name">名字</string>
     <string name="label_last_name">姓氏</string>
     <string name="label_phone">电话</string>
@@ -18,8 +19,11 @@
     <string name="menu_add_contact">添加</string>
     <string name="save">保存</string>
     <string name="cancel">取消</string>
+    <string name="error">错误</string>
+    <string name="Continue">继续</string>
     <string name="spinner_select_label">选择电话类型</string>
     <string name="undefined_phone_type_label">(未定义)</string>
     
     <string name="msg_contact_create_failture">创建联系人失败</string>
+    <string name="dialog_null_contact_name">名字和姓氏不能全部为空</string>
 </resources>
