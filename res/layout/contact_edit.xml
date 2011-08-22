@@ -1,45 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_width="match_parent" android:layout_height="match_parent">
   <TableLayout android:layout_width="match_parent"
-               android:layout_height="match_parent">
+               android:layout_height="match_parent"
+               android:stretchColumns="1">
+               
     <!-- 名字 -->
     <TableRow>
-      <TextView android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+      <TextView android:textStyle="bold"
+                android:gravity="right"
+                android:padding="3dip"
                 android:text="@string/label_first_name"/>
-    </TableRow>
-    <TableRow>
-      <EditText android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:hint="@string/label_first_name"
+      <EditText android:hint="@string/label_first_name"
+                android:padding="3dip"
+                android:scrollHorizontally="true"
                 android:layout_weight="1"
                 android:id="@+id/edit_text_first_name"/>
     </TableRow>
     <!-- 姓氏 -->
     <TableRow>
-      <TextView android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+      <TextView              
+                android:textStyle="bold"
+                android:gravity="right"
+                android:padding="3dip"
                 android:text="@string/label_last_name"/>
-    </TableRow>
-    <TableRow>
       <EditText android:id="@+id/edit_text_last_name"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:hint="@string/label_last_name"
-                android:layout_weight="1"/>
+                android:padding="3dip"
+                android:scrollHorizontally="true"
+                android:layout_weight="1"
+                android:hint="@string/label_last_name"/>
     </TableRow>
     <!-- 电话 -->
     <TableRow>
       <TextView android:text="@string/label_phone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-    </TableRow>
-    <TableRow>
+                android:textStyle="bold"
+                android:gravity="right"
+                android:padding="3dip"/>
       <EditText android:id="@+id/edit_text_phone"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:padding="3dip"
+                android:scrollHorizontally="true"
                 android:layout_weight="1"/>
       <Spinner android:id="@+id/spinner_phone_type"
                android:layout_width="wrap_content"
@@ -48,117 +47,112 @@
     <!-- email -->
     <TableRow>
       <TextView android:text="@string/label_email"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-    </TableRow>
-    <TableRow>
+                android:textStyle="bold"
+                android:gravity="right"
+                android:padding="3dip"/>
       <EditText android:id="@+id/edit_text_email"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:padding="3dip"
+                android:scrollHorizontally="true"
                 android:layout_weight="1"/>
     </TableRow>
     <!-- 微博 -->
     <TableRow>
       <TextView android:text="@string/label_weibo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-    </TableRow>
-    <TableRow>
+                android:textStyle="bold"
+                android:gravity="right"
+                android:padding="3dip"/>
       <EditText android:id="@+id/edit_text_weibo"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:padding="3dip"
+                android:scrollHorizontally="true"
                 android:layout_weight="1"/>
     </TableRow>
     <!-- QQ -->
     <TableRow>
       <TextView android:text="@string/label_qq"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>      
-    </TableRow>
-    <TableRow>
+                android:textStyle="bold"
+                android:gravity="right"
+                android:padding="3dip"/>
       <EditText android:id="@+id/edit_text_qq"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:padding="3dip"
+                android:scrollHorizontally="true"
                 android:layout_weight="1"/>
     </TableRow>
     <!-- msn -->
     <TableRow>
       <TextView android:text="@string/label_msn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>      
-    </TableRow>
-    <TableRow>
+                android:textStyle="bold"
+                android:gravity="right"
+                android:padding="3dip"/>
       <EditText android:id="@+id/edit_text_msn"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:padding="3dip"
+                android:scrollHorizontally="true"
                 android:layout_weight="1"/>
     </TableRow>
     <!-- 单位 -->
     <TableRow>
       <TextView android:text="@string/label_organization"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>      
-    </TableRow>
-    <TableRow>
+                android:textStyle="bold"
+                android:gravity="right"
+                android:padding="3dip"/>
       <EditText android:id="@+id/edit_text_organization"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:padding="3dip"
+                android:scrollHorizontally="true"
                 android:layout_weight="1"/>
     </TableRow>
     <!-- 地址 -->
     <TableRow>
       <TextView android:text="@string/label_address"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>      
-    </TableRow>
-    <TableRow>
+                android:textStyle="bold"
+                android:gravity="right"
+                android:padding="3dip"/>
       <EditText android:id="@+id/edit_text_address"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:padding="3dip"
+                android:scrollHorizontally="true"
                 android:layout_weight="1"/>
     </TableRow>
     <!-- 部门 -->
     <TableRow>
       <TextView android:text="@string/label_department"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>      
-    </TableRow>
-    <TableRow>
+                android:textStyle="bold"
+                android:gravity="right"
+                android:padding="3dip"/>
       <EditText android:id="@+id/edit_text_department"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:padding="3dip"
+                android:scrollHorizontally="true"
                 android:layout_weight="1"/>
     </TableRow>
     <!-- 职务 -->
     <TableRow>
       <TextView android:text="@string/label_position"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>      
-    </TableRow>
-    <TableRow>
+                android:textStyle="bold"
+                android:gravity="right"
+                android:padding="3dip"/>
       <EditText android:id="@+id/edit_text_position"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:padding="3dip"
+                android:scrollHorizontally="true"
                 android:layout_weight="1"/>
     </TableRow>
     <!-- 备注 -->
     <TableRow>
       <TextView android:text="@string/label_note"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>      
-    </TableRow>
-    <TableRow>
+                android:textStyle="bold"
+                android:gravity="right"
+                android:padding="3dip"/>
       <EditText android:id="@+id/edit_text_note"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:padding="3dip"
+                android:scrollHorizontally="true"
                 android:layout_weight="1"/>
-    </TableRow>p
-    <TableRow>
-      <Button android:layout_height="wrap_content"
-              android:text="@string/save"
-              android:id="@+id/button_contacts_save"
-              android:layout_width="match_parent"
-              android:layout_weight="1"/>
+    </TableRow>
+    <TableRow 
+              android:gravity="left">
+
+      <Button 
+              android:text="@string/cancel"
+              android:id="@+id/button_contacts_cancel_edit"/>
+      
+      <Button android:text="@string/save"
+              android:layout_weight="1"
+              android:id="@+id/button_contacts_save"/>
     </TableRow>
   </TableLayout>
 </ScrollView>

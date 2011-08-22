@@ -39,6 +39,7 @@ public class ContactEdit extends Activity implements View.OnClickListener {
     private EditText position_et = null; 
     private EditText note_et = null; 
     private Button save_bt = null;
+    private Button cancel_bt = null;
     private ArrayList<Integer> phone_types = null;
     private Spinner phone_types_sp = null;
     
@@ -92,6 +93,9 @@ public class ContactEdit extends Activity implements View.OnClickListener {
     {
         save_bt = (Button)findViewById(R.id.button_contacts_save);
         save_bt.setOnClickListener(this);
+        
+        cancel_bt = (Button)findViewById(R.id.button_contacts_cancel_edit);
+        cancel_bt.setOnClickListener(this);
     }
     
     /**
@@ -151,6 +155,10 @@ public class ContactEdit extends Activity implements View.OnClickListener {
                                                                                organization, address, department, position, note));
             // 刷新列表?
             break;
+        case R.id.button_contacts_cancel_edit:
+        	// 取消编辑
+        	finish();
+        	break;
         }
     }
 }
