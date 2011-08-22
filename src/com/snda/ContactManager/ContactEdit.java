@@ -12,12 +12,18 @@
 
 package com.snda.ContactManager;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import android.app.Activity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 
 public class ContactEdit extends Activity implements View.OnClickListener {
     private EditText first_name_et = null;
@@ -33,6 +39,9 @@ public class ContactEdit extends Activity implements View.OnClickListener {
     private EditText position_et = null; 
     private EditText note_et = null; 
     private Button save_bt = null;
+    private ArrayList<Integer> phone_types = null;
+    private Spinner phone_types_sp = null;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	// TODO Auto-generated method stub
@@ -41,11 +50,40 @@ public class ContactEdit extends Activity implements View.OnClickListener {
     	setContentView(R.layout.contact_edit);
     	
     	setEditText();
+        setSpinner();
     	setButton();
 
         Log.d(Constants.APP_TAG, ContactEdit.class.getName() + " onCreate");
     }
 
+    /**
+     *  <code>setSpinner</code> 设置phone type spinner
+     *
+     */
+    private void setSpinner()
+    {
+        // 设置默认的phone type列表
+        phone_types = new ArrayList<Integer>();
+        phone_types.add(ContactsContract.CommonDataKinds.Phone.TYPE_HOME);
+        phone_types.add(ContactsContract.CommonDataKinds.Phone.TYPE_WORK);
+        phone_types.add(ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);
+        phone_types.add(ContactsContract.CommonDataKinds.Phone.TYPE_OTHER);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Iterator<Integer> iter;
+        iter = phone_types.iterator();
+        while (iter.hasNext()) {
+            adapter.add(ContactsContract.CommonDataKinds.Phone.getTypeLabel(this.getResources(),
+                                                                            iter.next(),
+                                                                            getString(R.string.undefined_phone_type_label)).toString());
+        }
+
+        phone_types_sp = (Spinner)findViewById(R.id.spinner_phone_type);
+        phone_types_sp.setAdapter(adapter);
+        phone_types_sp.setPrompt(getString(R.string.spinner_select_label));
+    }
+    
     /**
      * <code>setButton</code> 设置Button控件
      *
@@ -89,6 +127,7 @@ public class ContactEdit extends Activity implements View.OnClickListener {
             String first_name = first_name_et.getText().toString();
             String last_name = last_name_et.getText().toString();
             String phone_number = phone_number_et.getText().toString();
+            int phone_type = phone_types.get(phone_types_sp.getSelectedItemPosition());
             String email = email_et.getText().toString();
             String weibo = weibo_et.getText().toString();
             String qq = qq_et.getText().toString();
@@ -100,14 +139,14 @@ public class ContactEdit extends Activity implements View.OnClickListener {
             String note = note_et.getText().toString();
             
             Log.i(Constants.APP_TAG, "Contact FirstName: " + first_name
-                  + " LastName: " + last_name + " Phone: " + phone_number + " Email: " + email
+                  + " LastName: " + last_name + " PhoneType: " + phone_type + " Phone: " + phone_number + " Email: " + email
                   + " Weibo: " + weibo + " QQ: " + qq + " MSN: " + msn + " Org: " + organization
                   + " Address: " + address + " Department: " + department + " Position: " + position
                   + " Note: " + note);
             
             // 存储数据到数据库中
             ContactManagerApplication application = (ContactManagerApplication)getApplication();
-            application.getContactManager().addContact(first_name, last_name, 1, phone_number,
+            application.getContactManager().addContact(first_name, last_name, phone_type, phone_number,
                                                        email, weibo, qq, msn, organization, address,
                                                        department, position, note);
             // 刷新列表?
