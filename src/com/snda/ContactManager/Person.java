@@ -40,8 +40,14 @@ public class Person {
     private String position;
     // 备注
     private String note;
+    // 唯一的id
+	private Integer uid;
 
-    public String getFirstName()
+    public Person(Integer id) {
+		setUid(id);
+	}
+
+	public String getFirstName()
     {
         return firstName;
     }
@@ -160,4 +166,12 @@ public class Person {
     {
         note = val;
     }
+
+	public Integer getUid() {
+		return uid;
+	}
+
+	public void setUid(Integer uid) {
+		this.uid = uid;
+	}
 }

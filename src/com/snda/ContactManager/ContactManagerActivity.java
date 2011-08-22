@@ -37,7 +37,7 @@ public class ContactManagerActivity extends ListActivity {
                                              ContactsContract.Contacts.DISPLAY_NAME };
         mContacts = managedQuery(ContactsContract.Contacts.CONTENT_URI,
                                  projection, null, null, ContactsContract.Contacts.DISPLAY_NAME);
-        // Display all contacts in a ListView
+        // 在ListView中显示所有联系人信息
         SimpleCursorAdapter mAdapter = new SimpleCursorAdapter(this,
                                                                android.R.layout.simple_list_item_1, 
                                                                // R.layout.contact_entry,
