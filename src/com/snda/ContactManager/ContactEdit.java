@@ -146,9 +146,9 @@ public class ContactEdit extends Activity implements View.OnClickListener {
             
             // 存储数据到数据库中
             ContactManagerApplication application = (ContactManagerApplication)getApplication();
-            application.getContactManager().addContact(first_name, last_name, phone_type, phone_number,
-                                                       email, weibo, qq, msn, organization, address,
-                                                       department, position, note);
+            application.getContactManager().addContact(new AddContactParameter(this, getContentResolver(), first_name, last_name,
+                                                                               phone_type, phone_number, email, weibo, qq, msn,
+                                                                               organization, address, department, position, note));
             // 刷新列表?
             break;
         }

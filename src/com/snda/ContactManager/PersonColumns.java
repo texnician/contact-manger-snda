@@ -19,7 +19,7 @@ public interface PersonColumns
     /**
      * 存储自定义信息的MIME-type
      */
-    public static final String MIME_SNDA_PERSON =
+    public static final String SNDA_PERSON_TYPE =
         "vnd.android.cursor.item/vnd.snda.contactmanager.person";
 
     // 微博

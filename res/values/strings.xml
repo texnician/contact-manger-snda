@@ -20,4 +20,6 @@
     
     <string name="spinner_select_label">选择电话类型</string>
     <string name="undefined_phone_type_label">(未定义)</string>
+    
+    <string name="msg_contact_create_failture">创建联系人失败</string>
 </resources>
