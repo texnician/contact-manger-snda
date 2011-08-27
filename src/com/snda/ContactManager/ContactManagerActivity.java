@@ -17,11 +17,14 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.SimpleCursorAdapter;
 
-public class ContactManagerActivity extends ListActivity {
+public class ContactManagerActivity extends ListActivity implements AdapterView.OnItemClickListener {
 	// private static final int MENU_CHANGE_CRITERIA = Menu.FIRST + 1;
     private static final int MENU_ADD_CONTACT = Menu.FIRST;
     
@@ -46,6 +49,9 @@ public class ContactManagerActivity extends ListActivity {
                                                                new int[] { android.R.id.text1 });
                                                                //new int[] { R.id.contact_entry_text });
         setListAdapter(mAdapter);
+
+        // 设置ListView监听器为this
+        getListView().setOnItemClickListener(this);
     }
     
     @Override
@@ -71,5 +77,20 @@ public class ContactManagerActivity extends ListActivity {
                 return true;
         }
     	return true;
+    }
+    
+    @Override
+    public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
+    	// 处理联系人选择事件
+    	if (mContacts.moveToPosition(position)) {
+            int selectedId = mContacts.getInt(0); // _ID column
+            Log.i(Constants.APP_TAG, "Contact with raw_contact_id =" + selectedId + " is selected.");
+            
+            Intent intent = new Intent(this, ContactDetail.class);
+            intent.putExtra(Constants.SELECTED_CONTACT_ID, selectedId);
+            intent.putExtra(Constants.DISPLAY_NAME, mContacts.getString(1));
+            startActivity(intent);
+            
+        }
     }
 }

@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent">
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal">
+      <TextView android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="名字"
+                android:layout_width="fill_parent"
+                android:id="@+id/display_name_tv"
+                android:textAppearance="?android:attr/textAppearanceLarge">
+      </TextView>
+    </LinearLayout>
+    
+    <!-- Phone -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="horizontal"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content">
+      <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+        <TextView android:text="@string/label_phone"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:textStyle="bold"
+                  />
+        <TextView android:text=""
+                  android:id="@+id/phone_number_tv"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"/>
+      </LinearLayout>
+      <ImageButton android:layout_height="match_parent"
+                   android:layout_width="wrap_content"
+                   android:id="@+id/bt_call"
+                   android:src="@android:drawable/sym_action_call">
+      </ImageButton>
+      <ImageButton android:layout_height="match_parent"
+                   android:layout_width="wrap_content"
+                   android:id="@+id/bt_sms"
+                   android:src="@android:drawable/sym_action_chat">
+      </ImageButton>        
+    </LinearLayout>
+
+    <!-- Email -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="horizontal"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content">
+      <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+        <TextView android:text="@string/label_email"
+                  android:textStyle="bold"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  />
+        <TextView android:text=""
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:id="@+id/email_tv"/>
+      </LinearLayout>
+      <ImageButton android:layout_height="match_parent"
+                   android:layout_width="wrap_content"
+                   android:id="@+id/bt_email"
+                   android:src="@android:drawable/sym_action_email"></ImageButton>        
+    </LinearLayout>
+
+    <!-- 微博 -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="horizontal"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content">
+      <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+        <TextView android:text="@string/label_weibo"
+                  android:textStyle="bold"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  />
+        <TextView android:text=""
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:id="@+id/weibo_tv"/>
+      </LinearLayout>
+      <ImageButton android:layout_height="match_parent"
+                   android:layout_width="wrap_content"
+                   android:id="@+id/bt_weibo"
+                   android:src="@drawable/weibo_48x48"></ImageButton>        
+    </LinearLayout>
+
+    <!-- QQ -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="horizontal"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content">
+      <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+        <TextView android:text="@string/label_qq"
+                  android:textStyle="bold"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  />
+        <TextView android:text=""
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:id="@+id/qq_tv"/>
+      </LinearLayout>
+    </LinearLayout>
+
+    <!-- MSN -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="horizontal"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content">
+      <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+        <TextView android:text="@string/label_msn"
+                  android:textStyle="bold"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  />
+        <TextView android:text=""
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:id="@+id/msn_tv"/>
+      </LinearLayout>
+    </LinearLayout>
+
+    <!-- 单位 -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="horizontal"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content">
+      <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+        <TextView android:text="@string/label_organization"
+                  android:textStyle="bold"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  />
+        <TextView android:text=""
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:id="@+id/organization_tv"/>
+      </LinearLayout>
+    </LinearLayout>
+
+    <!-- 地址 -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="horizontal"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content">
+      <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+        <TextView android:text="@string/label_address"
+                  android:textStyle="bold"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  />
+        <TextView android:text=""
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:id="@+id/address_tv"/>
+      </LinearLayout>
+    </LinearLayout>
+
+    <!-- 部门 -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="horizontal"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content">
+      <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+        <TextView android:text="@string/label_department"
+                  android:textStyle="bold"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  />
+        <TextView android:text=""
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:id="@+id/department_tv"/>
+      </LinearLayout>
+    </LinearLayout>
+
+    <!-- 职务 -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="horizontal"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content">
+      <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+        <TextView android:text="@string/label_position"
+                  android:textStyle="bold"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  />
+        <TextView android:text=""
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:id="@+id/position_tv"/>
+      </LinearLayout>
+    </LinearLayout>
+
+    <!-- 备注 -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="horizontal"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content">
+      <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+        <TextView android:text="@string/label_note"
+                  android:textStyle="bold"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  />
+        <TextView android:text=""
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:id="@+id/note_tv"/>
+      </LinearLayout>
+    </LinearLayout>
+  </LinearLayout>
+  
+</ScrollView>
