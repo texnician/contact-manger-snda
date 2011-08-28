@@ -1,18 +1,30 @@
 package com.snda.ContactManager;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.SearchManager;
 import android.content.Intent;
-import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ContactDetail extends Activity implements View.OnClickListener {
+    private static final int GROUP_ACTION = 0, GROUP_EDIT = 1;
+    private static final int MENU_EDIT_CONTACT = Menu.FIRST;
+    private static final int MENU_DEL_CONTACT = Menu.FIRST + 1;
+    private static final int MENU_CALL = Menu.FIRST + 2;
+    private static final int MENU_SMS = Menu.FIRST + 3;
+    private static final int MENU_MAIL = Menu.FIRST + 4;
+    private static final int MENU_WEIBO = Menu.FIRST + 5;
+	private static final int EDIT_CONTACT_ACTIVITY = 0;
+    
     // TextViews
     private TextView display_name_tv = null;
     private TextView phone_number_tv = null;
@@ -35,6 +47,9 @@ public class ContactDetail extends Activity implements View.OnClickListener {
     private String displayName = null;
     private int selectedId = 0;
     
+    // Person
+    Person person = null;
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// 查看联系人详细信息
@@ -52,63 +67,11 @@ public class ContactDetail extends Activity implements View.OnClickListener {
 		displayName = intent.getStringExtra(Constants.DISPLAY_NAME);
 		
 		Log.i(Constants.APP_TAG, "Start activity with selectedId =" + selectedId + ", display Name =" + displayName);
-		
-		// Gather email data from email table
-        Cursor email = getContentResolver().query(CommonDataKinds.Email.CONTENT_URI,
-                                                  new String[] { CommonDataKinds.Email.DATA },
-                                                  ContactsContract.Data.CONTACT_ID + " = " + selectedId, null, null);
-        // Gather phone data from phone table
-        Cursor phone = getContentResolver().query(CommonDataKinds.Phone.CONTENT_URI,
-                                                  new String[] { CommonDataKinds.Phone.NUMBER },
-                                                  ContactsContract.Data.CONTACT_ID + " = " + selectedId, null, null);
-        // Gather addresses from address table
-        Cursor address = getContentResolver().query(CommonDataKinds.StructuredPostal.CONTENT_URI,
-                                                    new String[] { CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS },
-                                                    ContactsContract.Data.CONTACT_ID + " = " + selectedId, null, null);
-        //Build the dialog message
-        StringBuilder sb = new StringBuilder();
-        sb.append(email.getCount() + " Emails\n");
-        if (email.moveToFirst()) {
-            do {
-                sb.append("Email: " + email.getString(0));
-                sb.append('\n');
-            } while (email.moveToNext());
-            sb.append('\n');
-        }
-        sb.append(phone.getCount() + " Phone Numbers\n");
-        if (phone.moveToFirst()) {
-            do {
-                sb.append("Phone: " + phone.getString(0));
-                sb.append('\n');
-            } while (phone.moveToNext());
-            sb.append('\n');
-        }
-        sb.append(address.getCount() + " Addresses\n");
-        if (address.moveToFirst()) {
-            do {
-                sb.append("Address:\n" + address.getString(0));
-            } while (address.moveToNext());
-            sb.append('\n');
-        }
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(displayName); // Display name
-        builder.setMessage(sb.toString());
-        builder.setPositiveButton("OK", null);
-        builder.create().show();
 
-        display_name_tv.setText(displayName);
-        
-        if (phone.getCount() > 0) {
-            phone.moveToFirst();
-            phone_number_tv.setText(phone.getString(0));
-        }
-        if (email.getCount() > 0) {
-            email.moveToFirst();
-            email_tv.setText(email.getString(0));
-        }
-        email.close();
-        phone.close();
-        address.close();
+        // 显示人物信息
+		ContactManagerApplication application = (ContactManagerApplication)getApplication();
+        person = application.getContactManager().makePerson(this, getContentResolver(), selectedId);
+        displayPersion();
 	}
     
 	@Override
@@ -117,19 +80,33 @@ public class ContactDetail extends Activity implements View.OnClickListener {
         switch (v.getId()) {
         case R.id.bt_call:
             Log.i(Constants.APP_TAG, "Phone Button Clicked");
+            callContact();
             break;
         case R.id.bt_sms:
             Log.i(Constants.APP_TAG, "SMS Button Clicked");
+            sendSMS();
             break;
         case R.id.bt_email:
             Log.i(Constants.APP_TAG, "Email Button Clicked");
+            sendMail();
             break;
         case R.id.bt_weibo:
             Log.i(Constants.APP_TAG, "Weibo Button Clicked");
             break;
         }
 	}
+    
+    private void callContact()
+    {
+        String number = phone_number_tv.getText().toString();
 
+        if (!number.equals("")) {
+            Log.i(Constants.APP_TAG, "Calling " + number);
+            Intent intent = new Intent(Intent.ACTION_CALL,
+                                       Uri.parse("tel:" + number));
+            startActivity(intent);
+        }
+    }
     
     /**
      * <code>setTextViews</code> 设置TextViews
@@ -167,5 +144,162 @@ public class ContactDetail extends Activity implements View.OnClickListener {
         
         weibo_bt = (ImageButton)findViewById(R.id.bt_weibo);
         weibo_bt.setOnClickListener(this);
+    }
+
+    /**
+     * <code>displayPersion</code> 在界面上显示人物信息
+     * @param  
+     *
+     */
+    private void displayPersion()
+    {
+        display_name_tv.setText(person.getDisplayName());
+        
+        ArrayList<String> phones = person.getPhoneList();
+        if (phones.size() > 0) {
+        	phone_number_tv.setText(phones.get(0));
+        }
+        
+        ArrayList<String> emails = person.getMailList();
+        if (emails.size() > 0) {
+        	email_tv.setText(emails.get(0));
+        }
+        
+        weibo_tv.setText(person.getWeibo());
+        qq_tv.setText(person.getQQ());
+        msn_tv.setText(person.getMSN());
+        organization_tv.setText(person.getOrg());
+        address_tv.setText(person.getAddress());
+        department_tv.setText(person.getDepartment());
+        position_tv.setText(person.getPosition());
+        note_tv.setText(person.getNote());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	// 创建菜单项
+    	super.onCreateOptionsMenu(menu);
+    	menu.add(ContactDetail.GROUP_ACTION, 
+                 ContactDetail.MENU_CALL,
+                 0,
+                 R.string.menu_call_contact).setIcon(android.R.drawable.ic_menu_call);
+    	menu.add(ContactDetail.GROUP_ACTION,
+                 ContactDetail.MENU_SMS,
+                 0,
+                 R.string.menu_sms_contact).setIcon(android.R.drawable.sym_action_chat);
+    	menu.add(ContactDetail.GROUP_ACTION,
+                 ContactDetail.MENU_MAIL,
+                 0,
+                 R.string.menu_mail_contact).setIcon(android.R.drawable.ic_dialog_email);
+    	menu.add(ContactDetail.GROUP_ACTION,
+                 ContactDetail.MENU_WEIBO,
+                 0,
+                 R.string.menu_weibo_contact).setIcon(R.drawable.weibo_64x64);
+    	
+    	menu.add(ContactDetail.GROUP_EDIT,
+                 ContactDetail.MENU_EDIT_CONTACT,
+                 0,
+                 R.string.edit_contact).setIcon(android.R.drawable.ic_menu_edit);
+    	
+    	menu.add(ContactDetail.GROUP_EDIT,
+    			 ContactDetail.MENU_DEL_CONTACT,
+    			 0,
+    			 R.string.delete).setIcon(android.R.drawable.ic_menu_delete);
+    	return true;
+    }
+    
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+    	// 响应菜单事件
+    	super.onMenuItemSelected(featureId, item);
+    	switch (item.getItemId()) {
+            case MENU_CALL:
+                // 呼叫
+            	Log.i(Constants.APP_TAG, "Menu call contact selected");
+                callContact();
+                return true;
+            case MENU_SMS:
+            	// 短信
+            	Log.i(Constants.APP_TAG, "Menu sms contact selected");
+                sendSMS();
+            	return true;
+            case MENU_MAIL:
+            	// 邮件
+            	Log.i(Constants.APP_TAG, "Menu mail contact selected");
+                sendMail();
+            	return true;
+            case MENU_WEIBO:
+            	// 微博
+            	Log.i(Constants.APP_TAG, "Menu weibo contact selected");
+            	return true;
+            case MENU_EDIT_CONTACT:
+            	Log.i(Constants.APP_TAG, "Menu edit contact selected");
+                editContact();
+            	return true;
+            case MENU_DEL_CONTACT:
+            	Log.i(Constants.APP_TAG, "Menu delete contact selected");
+            	deleteContact();
+            	return true;
+        }
+    	return true;
+    }
+
+    private void deleteContact() {
+		ContactManagerApplication application = (ContactManagerApplication)getApplication();
+		application.getContactManager().deleteContact(this, getContentResolver(), person.getUid());
+
+        CharSequence txt = this.getString(R.string.msg_contact_deleted);
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(this, txt, duration);
+        toast.show();
+        
+		finish();
+	}
+
+	private void editContact()
+    {
+        // Start edit activity for result
+        Intent intent = new Intent(this, ContactEdit.class);
+        intent.putExtra(Constants.SELECTED_CONTACT_ID, person.getUid());
+        intent.putExtra(Constants.LOOKUP_KEY, person.getLookupKey());
+        startActivityForResult(intent, EDIT_CONTACT_ACTIVITY);
+    }
+    
+    public void onActivityResult(int requestCode, int resultCode, Intent result)
+    {
+    	if (requestCode == EDIT_CONTACT_ACTIVITY && resultCode == RESULT_OK) {
+    		Log.i(Constants.APP_TAG, "EditActivity finished OK");
+    		String lookupKey = result.getStringExtra(Constants.LOOKUP_KEY);
+    		if (lookupKey != Constants.INVALID_LOOKUP_KEY) {
+    			// 刷新person的信息
+    			ContactManagerApplication application = (ContactManagerApplication)getApplication();
+    			person = application.getContactManager().makePerson(this, getContentResolver(), lookupKey);
+    			if (person != null) {
+    				displayPersion();
+    			}
+    			else {
+    				finish();
+    			}
+    		}
+    	}
+    	else {
+    		Log.i(Constants.APP_TAG, "EditActivity CANCELED");
+    	}
+    }
+
+    private void sendSMS() {
+          Uri smsToUri = Uri.parse("smsto:" + phone_number_tv.getText().toString());
+          Intent intent = new Intent(android.content.Intent.ACTION_SENDTO, smsToUri);
+          intent.putExtra("address", phone_number_tv.getText().toString());
+          startActivity(intent);
+    }
+
+    private void sendMail()
+    {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_EMAIL, new String [] { email_tv.getText().toString() });
+        intent.putExtra("address", email_tv.getText().toString());
+        intent.setType("text/plain");
+        startActivity(intent);
     }
 }

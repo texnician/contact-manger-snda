@@ -17,9 +17,14 @@ import java.lang.String;
 
 public class Person {
     // 名
+	private String lookupKey;
+	
     private String firstName;
     // 姓
     private String lastName;
+    
+    private String displayName;
+    
     // 电话
     private ArrayList<String> phoneList;
     // 邮件
@@ -45,6 +50,8 @@ public class Person {
 
     public Person(Integer id) {
 		setUid(id);
+        phoneList = new ArrayList<String>();
+        mailList = new ArrayList<String>();
 	}
 
 	public String getFirstName()
@@ -174,4 +181,21 @@ public class Person {
 	public void setUid(Integer uid) {
 		this.uid = uid;
 	}
+
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
+
+	public String getLookupKey() {
+		return lookupKey;
+	}
+
+	public void setLookupKey(String lookupKey) {
+		this.lookupKey = lookupKey;
+	}
+
 }

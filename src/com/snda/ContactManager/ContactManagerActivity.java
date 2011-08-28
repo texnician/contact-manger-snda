@@ -27,6 +27,8 @@ import android.widget.SimpleCursorAdapter;
 public class ContactManagerActivity extends ListActivity implements AdapterView.OnItemClickListener {
 	// private static final int MENU_CHANGE_CRITERIA = Menu.FIRST + 1;
     private static final int MENU_ADD_CONTACT = Menu.FIRST;
+    private static final int MENU_EXPORT_CONTACT = Menu.FIRST + 1;
+    private static final int MENU_IMPORT_CONTACT = Menu.FIRST + 2;
     
     /** Called when the activity is first created. */
 	Cursor mContacts;
@@ -61,7 +63,15 @@ public class ContactManagerActivity extends ListActivity implements AdapterView.
     	menu.add(0, 
                  ContactManagerActivity.MENU_ADD_CONTACT,
                  0,
-                 R.string.menu_add_contact).setIcon(android.R.drawable.ic_menu_more);
+                 R.string.menu_add_contact).setIcon(android.R.drawable.ic_menu_add);
+        menu.add(0, 
+                 ContactManagerActivity.MENU_EXPORT_CONTACT,
+                 0,
+                 R.string.menu_export_contact);
+        menu.add(0, 
+                 ContactManagerActivity.MENU_IMPORT_CONTACT,
+                 0,
+                 R.string.menu_import_contact);
     	return true;
     }
     
@@ -70,11 +80,20 @@ public class ContactManagerActivity extends ListActivity implements AdapterView.
     	// 响应菜单事件
     	super.onMenuItemSelected(featureId, item);
     	switch (item.getItemId()) {
-            case MENU_ADD_CONTACT:
-                // 启动创建联系人的 activity
-            	Intent intent = new Intent(this, ContactEdit.class);
-            	startActivity(intent);
-                return true;
+        case MENU_ADD_CONTACT:
+            Log.i(Constants.APP_TAG, "MENU_ADD_CONTACT selected");
+            // 启动创建联系人的 activity
+            Intent intent = new Intent(this, ContactEdit.class);
+            startActivity(intent);
+            return true;
+        case MENU_EXPORT_CONTACT:
+            Log.i(Constants.APP_TAG, "MENU_EXPORT_CONTACT selected");
+            exportContacts();
+            return true;
+        case MENU_IMPORT_CONTACT:
+            Log.i(Constants.APP_TAG, "MENU_IMPORT_CONTACT selected");
+            importContacts();
+            return true;
         }
     	return true;
     }
@@ -90,7 +109,63 @@ public class ContactManagerActivity extends ListActivity implements AdapterView.
             intent.putExtra(Constants.SELECTED_CONTACT_ID, selectedId);
             intent.putExtra(Constants.DISPLAY_NAME, mContacts.getString(1));
             startActivity(intent);
-            
+    	}
+    }
+    
+    @Override
+    public boolean onSearchRequested() {
+    	// TODO Auto-generated method stub
+    	super.onSearchRequested();
+
+        // 调用联系人搜索
+    	Intent intent = new Intent();
+    	intent.setAction("com.android.contacts.action.FILTER_CONTACTS");
+    	intent.setType("vnd.android.cursor.dir/contact");
+    	intent.addCategory("android.intent.category.DEFAULT");
+    	startActivityForResult(intent, 0);
+            	
+    	// Intent intent = new Intent();
+    	// intent.putExtra(SearchManager.QUERY, display_name_tv.getText().toString());
+    	// intent.setAction(Intent.ACTION_SEARCH);
+    	// intent.setPackage("com.android.contacts");
+    	// startActivity(intent);
+    	return true;
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+     	super.onActivityResult(requestCode, resultCode, data);
+    	
+    	Cursor c = null;
+        
+        if (requestCode == 0) {
+            try{
+                if (data != null) {
+                    c = getContentResolver().query(data.getData(), null, null, null, null);
+                }
+                if (c != null) {
+                    c.moveToFirst();
+                    for(int i = 0; i < c.getColumnCount(); i++) {
+                        String name = c.getColumnName(i);
+                        String result = c.getString(i);
+                        Log.i(Constants.APP_TAG, "ColName: " + name + " ColData: " + result);
+                    }
+                    c.close();
+                }
+            }
+            catch (Exception e) {
+                Log.e(Constants.APP_TAG, e.getMessage());
+            }
         }
+    }
+
+    private void exportContacts() {
+        ContactManagerApplication application = (ContactManagerApplication)getApplication();
+        application.getContactManager().exportContacts(this, getContentResolver(), "my_contacts.xml");
+    }
+
+    private void importContacts() {
+        ContactManagerApplication application = (ContactManagerApplication)getApplication();
+        application.getContactManager().importContacts(this, getContentResolver(), "my_contacts.xml");
     }
 }
