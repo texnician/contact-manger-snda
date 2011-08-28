@@ -37,4 +37,10 @@
     <string name="msg_contact_create_failture">创建联系人失败</string>
     <string name="msg_contact_deleted">联系人已删除</string>
     <string name="dialog_null_contact_name">名字和姓氏不能全部为空</string>
+    <string name="select_export_dir_title">选择导出文件的目录</string>
+    <string name="select_import_file_title">选择要导入的文件</string>
+    <string name="bad_sdcard">SD卡错误</string>
+    <string name="open_import_file_error">打开导入文件错误</string>
+    <string name="success_exported">导出联系人成功</string>
+    <string name="success_imported">导入联系人成功</string>
 </resources>

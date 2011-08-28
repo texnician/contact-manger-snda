@@ -15,7 +15,9 @@ package com.snda.ContactManager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -25,12 +27,13 @@ import java.lang.Integer;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlSerializer;
 
-import android.app.Activity;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
+import android.os.Environment;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds;
 import android.util.Log;
@@ -599,39 +602,62 @@ public class ContactManager {
     public void deleteContact(ContactDetail context, ContentResolver resolver, int contactId)
     {
         // 删除一个联系人
-        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
-        ops.add(ContentProviderOperation.newDelete(ContactsContract.Contacts.CONTENT_URI)
-                .withSelection(ContactsContract.Contacts._ID + " =?",
-                               new String [] { String.valueOf(contactId) })
-                .build());
-        ops.add(ContentProviderOperation.newDelete(ContactsContract.Data.CONTENT_URI)
-                .withSelection(ContactsContract.Data.RAW_CONTACT_ID + " =?",
-                               new String [] { String.valueOf(contactId) })
-                .build());
-        ops.add(ContentProviderOperation.newDelete(ContactsContract.RawContacts.CONTENT_URI)
-                .withSelection(ContactsContract.RawContacts._ID + " =?",
-                               new String [] { String.valueOf(contactId) })
-                .build());
+        Cursor cursor = resolver.query(ContactsContract.Contacts.CONTENT_URI,
+        		                       null,
+        		                       ContactsContract.Contacts._ID + " =?",
+                                       new String [] { String.valueOf(contactId) }, null);
         
-        Log.i(Constants.APP_TAG,"Deleting contact: " + contactId);
-        try {
-            resolver.applyBatch(ContactsContract.AUTHORITY, ops);
-        } catch (Exception e) {
-            // 显示警告信息
-            Context ctx = context;
-            CharSequence txt = ctx.getString(R.string.msg_contact_create_failture);
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(ctx, txt, duration);
-            toast.show();
+        Log.i(Constants.APP_TAG, "delete contact " + contactId + ", found " + cursor.getCount());
 
-            // Log exception
-            Log.e(Constants.APP_TAG, "Delete contact exception: " + e);
+        if (cursor.moveToFirst()) {
+            do {
+                String lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
+                Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey);
+                Log.d(Constants.APP_TAG, "The uri is " + uri.toString());
+                resolver.delete(uri, null, null);
+            } while (cursor.moveToNext());
         }
+        // ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+        // ops.add(ContentProviderOperation.newDelete(ContactsContract.Contacts.CONTENT_URI)
+        //         .withSelection(ContactsContract.Contacts._ID + " =?",
+        //                        new String [] { String.valueOf(contactId) })
+        //         .build());
+        // ops.add(ContentProviderOperation.newDelete(ContactsContract.Data.CONTENT_URI)
+        //         .withSelection(ContactsContract.Data.RAW_CONTACT_ID + " =?",
+        //                        new String [] { String.valueOf(contactId) })
+        //         .build());
+        // ops.add(ContentProviderOperation.newDelete(ContactsContract.RawContacts.CONTENT_URI)
+        //         .withSelection(ContactsContract.RawContacts._ID + " =?",
+        //                        new String [] { String.valueOf(contactId) })
+        //         .build());
+        
+        // Log.i(Constants.APP_TAG,"Deleting contact: " + contactId);
+        // try {
+        //     resolver.applyBatch(ContactsContract.AUTHORITY, ops);
+        // } catch (Exception e) {
+        //     // 显示警告信息
+        //     Context ctx = context;
+        //     CharSequence txt = ctx.getString(R.string.msg_contact_create_failture);
+        //     int duration = Toast.LENGTH_SHORT;
+        //     Toast toast = Toast.makeText(ctx, txt, duration);
+        //     toast.show();
+
+        //     // Log exception
+        //     Log.e(Constants.APP_TAG, "Delete contact exception: " + e);
+        // }
     }
 
     public String exportContacts(Context context, ContentResolver resolver, String filename)
     {
         Log.i(Constants.APP_TAG, "Exporting all contacts to " + filename);
+
+        // 获取文件地址
+    	File dataFile = new File(Environment.getExternalStorageDirectory(), filename);
+        // 检查SD卡是否可用
+    	if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+    		Toast.makeText(context, context.getString(R.string.bad_sdcard), Toast.LENGTH_SHORT).show();
+    		return "";
+    	}
 
         Cursor allContacts = resolver.query(ContactsContract.Contacts.CONTENT_URI,
                                             new String [] { ContactsContract.Contacts._ID },
@@ -763,7 +789,7 @@ public class ContactManager {
         //把写成的xml数据输出到文件  
         OutputStream outStream;  
         try {
-            outStream = context.openFileOutput(filename, 0);  
+        	outStream = new FileOutputStream(dataFile, false);
             OutputStreamWriter outStreamWriter = new OutputStreamWriter(outStream); 
             outStreamWriter.write(contactsXml);
             outStreamWriter.close();  
@@ -771,15 +797,20 @@ public class ContactManager {
         } catch (Exception e) {  
             e.printStackTrace();  
         }
-                
-        return xmlWriter.toString();
+        
+        Log.i(Constants.APP_TAG, "Successfully export " + personList.size() + " contacts to file "
+        	  + dataFile.getAbsolutePath());
+        
+        Toast.makeText(context, context.getString(R.string.success_exported), Toast.LENGTH_SHORT).show();
+        
+        return dataFile.getAbsolutePath();
     }
 
     // 导入联系人
     public void importContacts(Context context, ContentResolver resolver, String filename)
     {
     	Log.i(Constants.APP_TAG, "Importing contacts from " + filename);
-    	
+
         ArrayList<Person> personList = readContactsFromFile(context, filename);
 
         if (personList != null) {
@@ -798,6 +829,7 @@ public class ContactManager {
                 		                           person.getNote()));
             }
             Log.i(Constants.APP_TAG, "Imported " + personList.size() + " contacts");
+            Toast.makeText(context, context.getString(R.string.success_imported), Toast.LENGTH_SHORT).show();
         }
         else {
         	Log.e(Constants.APP_TAG, "Imported 0 contacts");
@@ -805,12 +837,22 @@ public class ContactManager {
     }
         
     private ArrayList<Person> readContactsFromFile(Context context, String filename) {
+    	
+    	// 获取文件地址
+    	File dataFile = new File(Environment.getExternalStorageDirectory(), filename);
+        // 检查SD卡是否可用
+    	if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+    		Toast.makeText(context, context.getString(R.string.bad_sdcard), Toast.LENGTH_SHORT).show();
+    		return null;
+    	}
+    	
         InputStream inputStream;
         // 打开文件
         try {
-            inputStream = context.openFileInput(filename);
-        } catch (Exception e) {  
+            inputStream = new FileInputStream(dataFile);
+        } catch (Exception e) { 
             e.printStackTrace();
+            Toast.makeText(context, context.getString(R.string.open_import_file_error), Toast.LENGTH_SHORT).show();
             return null;
         }
         

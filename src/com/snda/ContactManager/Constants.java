@@ -8,4 +8,5 @@ public final class Constants {
     public static final String LOOKUP_KEY = "LOOKUP_KEY";
     public static final String DISPLAY_NAME = "DISPLAy_NAME";
 	public static final String INVALID_LOOKUP_KEY = "INVALID_LOOKUP_KEY";
+	public static final String EXPORT_FILE_NAME = "snda_contact_export.xml";
 }

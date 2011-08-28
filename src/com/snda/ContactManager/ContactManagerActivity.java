@@ -12,10 +12,16 @@
 
 package com.snda.ContactManager;
 
+import java.io.File;
+import java.net.URI;
+
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CallLog;
+import android.provider.Contacts.People;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.Menu;
@@ -27,9 +33,14 @@ import android.widget.SimpleCursorAdapter;
 public class ContactManagerActivity extends ListActivity implements AdapterView.OnItemClickListener {
 	// private static final int MENU_CHANGE_CRITERIA = Menu.FIRST + 1;
     private static final int MENU_ADD_CONTACT = Menu.FIRST;
-    private static final int MENU_EXPORT_CONTACT = Menu.FIRST + 1;
-    private static final int MENU_IMPORT_CONTACT = Menu.FIRST + 2;
+    private static final int MENU_CALL_LOG = Menu.FIRST + 1;
+    private static final int MENU_FREQ = Menu.FIRST + 2;
+    private static final int MENU_EXPORT_CONTACT = Menu.FIRST + 3;
+    private static final int MENU_IMPORT_CONTACT = Menu.FIRST + 4;
     
+    
+    private static final int SEARCH_CONTACT_INTENT = 0;
+    private static final int SELECT_EXPORT_DIR_INTENT = 1;
     /** Called when the activity is first created. */
 	Cursor mContacts;
 
@@ -64,6 +75,14 @@ public class ContactManagerActivity extends ListActivity implements AdapterView.
                  ContactManagerActivity.MENU_ADD_CONTACT,
                  0,
                  R.string.menu_add_contact).setIcon(android.R.drawable.ic_menu_add);
+    	menu.add(0, 
+                 ContactManagerActivity.MENU_CALL_LOG,
+                 0,
+                 "通话记录").setIcon(android.R.drawable.sym_call_incoming);
+    	menu.add(0, 
+                 ContactManagerActivity.MENU_FREQ,
+                 0,
+                 "查看常用联系人").setIcon(android.R.drawable.star_big_on);
         menu.add(0, 
                  ContactManagerActivity.MENU_EXPORT_CONTACT,
                  0,
@@ -86,6 +105,17 @@ public class ContactManagerActivity extends ListActivity implements AdapterView.
             Intent intent = new Intent(this, ContactEdit.class);
             startActivity(intent);
             return true;
+        case MENU_CALL_LOG:
+        	Log.i(Constants.APP_TAG, "MENU_CALL_LOG selected");
+        	Intent tmp = new Intent(Intent.ACTION_VIEW);
+            tmp.setType(CallLog.Calls.CONTENT_TYPE);
+            startActivity(tmp);
+        	return true;
+        case MENU_FREQ:
+        	Log.i(Constants.APP_TAG, "MENU_LIST_FREQUENT selected");
+        	Intent it_log = new Intent("com.android.contacts.action.LIST_STREQUENT");
+        	startActivity(it_log);
+        	return true;
         case MENU_EXPORT_CONTACT:
             Log.i(Constants.APP_TAG, "MENU_EXPORT_CONTACT selected");
             exportContacts();
@@ -122,7 +152,7 @@ public class ContactManagerActivity extends ListActivity implements AdapterView.
     	intent.setAction("com.android.contacts.action.FILTER_CONTACTS");
     	intent.setType("vnd.android.cursor.dir/contact");
     	intent.addCategory("android.intent.category.DEFAULT");
-    	startActivityForResult(intent, 0);
+    	startActivityForResult(intent, SEARCH_CONTACT_INTENT);
             	
     	// Intent intent = new Intent();
     	// intent.putExtra(SearchManager.QUERY, display_name_tv.getText().toString());
@@ -138,7 +168,7 @@ public class ContactManagerActivity extends ListActivity implements AdapterView.
     	
     	Cursor c = null;
         
-        if (requestCode == 0) {
+        if (requestCode == SEARCH_CONTACT_INTENT) {
             try{
                 if (data != null) {
                     c = getContentResolver().query(data.getData(), null, null, null, null);
@@ -157,15 +187,30 @@ public class ContactManagerActivity extends ListActivity implements AdapterView.
                 Log.e(Constants.APP_TAG, e.getMessage());
             }
         }
+        else if (requestCode == SELECT_EXPORT_DIR_INTENT && resultCode == RESULT_OK) {
+        	  Uri uri = data.getData();
+        	  String type = data.getType();
+        	  Log.i(Constants.APP_TAG, "Select export dir completed: "+ uri + " "+ type);
+        	  if (uri != null)
+        	  {
+        		  String path = uri.toString();
+        		  if (path.toLowerCase().startsWith("file://"))
+        		  {
+        			  // Selected file/directory path is below
+        			  path = (new File(URI.create(path))).getAbsolutePath();
+        			  Log.i(Constants.APP_TAG, "Absolute Path is: " + path);
+        		  }
+        	  }
+        }
     }
 
     private void exportContacts() {
         ContactManagerApplication application = (ContactManagerApplication)getApplication();
-        application.getContactManager().exportContacts(this, getContentResolver(), "my_contacts.xml");
+        application.getContactManager().exportContacts(this, getContentResolver(), Constants.EXPORT_FILE_NAME);
     }
 
     private void importContacts() {
         ContactManagerApplication application = (ContactManagerApplication)getApplication();
-        application.getContactManager().importContacts(this, getContentResolver(), "my_contacts.xml");
+        application.getContactManager().importContacts(this, getContentResolver(), Constants.EXPORT_FILE_NAME);
     }
 }
