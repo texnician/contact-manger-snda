@@ -1,9 +1,20 @@
+/**
+ * Copyright (C)2011, Shanda Corporation. All rights reserved.
+ *
+ * @file: ContactDetail.java
+ *
+ * @author: tangyaguang@snda.com 018386
+ *
+ * @date: 2011-08-27 00:27:46
+ *
+ * @doc: 联系人详细信息 Activity
+ */
+
 package com.snda.ContactManager;
 
 import java.util.ArrayList;
 
 import android.app.Activity;
-import android.app.SearchManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
