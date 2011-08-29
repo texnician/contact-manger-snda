@@ -15,11 +15,17 @@ package com.snda.ContactManager;
 import java.io.File;
 import java.net.URI;
 
+import android.app.Dialog;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.provider.CallLog;
 import android.provider.Contacts.People;
 import android.provider.ContactsContract;
@@ -29,6 +35,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
 public class ContactManagerActivity extends ListActivity implements AdapterView.OnItemClickListener {
 	// private static final int MENU_CHANGE_CRITERIA = Menu.FIRST + 1;
@@ -41,6 +48,17 @@ public class ContactManagerActivity extends ListActivity implements AdapterView.
     
     private static final int SEARCH_CONTACT_INTENT = 0;
     private static final int SELECT_EXPORT_DIR_INTENT = 1;
+    
+    private static final int EXPORT_DIALOG = 0;
+    private static final int IMPORT_DIALOG = 1;
+    
+    // 得到主线程的Looper对象  
+    Looper looper = Looper.myLooper();
+    
+    // TaskHandler来处理导入/导出线程中传来的消息  
+    TaskHandler taskHandler = new TaskHandler(this, looper);
+
+    
     /** Called when the activity is first created. */
 	Cursor mContacts;
 
@@ -147,12 +165,28 @@ public class ContactManagerActivity extends ListActivity implements AdapterView.
     	// TODO Auto-generated method stub
     	super.onSearchRequested();
 
-        // 调用联系人搜索
-    	Intent intent = new Intent();
-    	intent.setAction("com.android.contacts.action.FILTER_CONTACTS");
-    	intent.setType("vnd.android.cursor.dir/contact");
-    	intent.addCategory("android.intent.category.DEFAULT");
-    	startActivityForResult(intent, SEARCH_CONTACT_INTENT);
+
+    	try {
+    		Intent intent = new Intent(Intent.ACTION_SEARCH, ContactsContract.Contacts.CONTENT_URI);
+    		startActivity(intent);
+    		return true;
+    	}
+    	catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    	// 调用联系人搜索
+    	try {
+    		Intent intent = new Intent();
+    	    intent.setAction("com.android.contacts.action.FILTER_CONTACTS");
+    	    intent.setType("vnd.android.cursor.dir/contact");
+    	    intent.addCategory("android.intent.category.DEFAULT");
+    	    startActivity(intent);
+    	    return true;
+    	}
+    	catch (Exception e) {
+    	    e.printStackTrace();
+    	}
             	
     	// Intent intent = new Intent();
     	// intent.putExtra(SearchManager.QUERY, display_name_tv.getText().toString());
@@ -205,12 +239,97 @@ public class ContactManagerActivity extends ListActivity implements AdapterView.
     }
 
     private void exportContacts() {
-        ContactManagerApplication application = (ContactManagerApplication)getApplication();
-        application.getContactManager().exportContacts(this, getContentResolver(), Constants.EXPORT_FILE_NAME);
+    	final ProgressDialog dialog = new ProgressDialog(this);
+    	dialog.setTitle("导出联系人");
+    	dialog.setMessage("正在导出联系人...");
+    	dialog.setIndeterminate(true);
+    	dialog.show();
+    	Thread thread = new Thread(new Runnable() {
+    		public void run() {
+    			ContactManagerApplication application = (ContactManagerApplication)getApplication();
+    			application.getContactManager().exportContacts(ContactManagerActivity.this, getContentResolver(), taskHandler, Constants.EXPORT_FILE_NAME);
+    			dialog.cancel();
+    		}
+    	});
+    	thread.start();
     }
 
     private void importContacts() {
-        ContactManagerApplication application = (ContactManagerApplication)getApplication();
-        application.getContactManager().importContacts(this, getContentResolver(), Constants.EXPORT_FILE_NAME);
+    	final ProgressDialog dialog = new ProgressDialog(this);
+    	dialog.setTitle("导入联系人");
+    	dialog.setMessage("正在导入联系人...");
+    	dialog.setIndeterminate(true);
+    	Thread thread = new Thread(new Runnable() {
+    		public void run() {
+    			ContactManagerApplication application = (ContactManagerApplication)getApplication();
+    			application.getContactManager().importContacts(ContactManagerActivity.this, getContentResolver(), taskHandler, Constants.EXPORT_FILE_NAME);
+    			dialog.cancel();
+    		}
+    	});
+    	thread.start();
     }
+    
+    @Override
+    protected Dialog onCreateDialog(int id) {
+    	// 进度条
+    	super.onCreateDialog(id);
+    	
+    	switch (id) {
+            case EXPORT_DIALOG: {
+                ProgressDialog dialog = new ProgressDialog(this);
+                dialog.setTitle("导出联系人");
+                dialog.setMessage("正财导出联系人...");
+                dialog.setIndeterminate(true);
+                dialog.setCancelable(true);
+                return dialog;
+            }
+            case IMPORT_DIALOG: {
+                ProgressDialog dialog = new ProgressDialog(this);
+                dialog.setTitle("导入联系人");
+                dialog.setMessage("正在导入联系人...");
+                dialog.setIndeterminate(true);
+                dialog.setCancelable(true);
+                return dialog;
+            }
+        }
+        return null;
+    }
+    
+    // 导入/导出事件的handler
+    class TaskHandler extends Handler {
+    	private Context context;
+        public TaskHandler() {}  
+        public TaskHandler(Context context, Looper looper) {
+            super(looper);
+            this.context = context;
+        }  
+        @Override  
+        public void handleMessage(Message msg) {
+            if (msg.arg1 == Constants.EXPORT_SUCCESS_EVENT) {  
+                Log.i(Constants.APP_TAG, "On EXPORT_SUCCESS_EVENT");
+                String info = msg.getData().getString("info");
+                Toast toast = Toast.makeText(context, info, Toast.LENGTH_LONG);
+                toast.setDuration(5);
+                toast.show();
+                
+            } else if (msg.arg1 == Constants.EXPORT_ERROR_EVENT) {
+            	Log.i(Constants.APP_TAG, "On EXPORT_ERROR_EVENT");
+            	String info = msg.getData().getString("info");
+                Toast.makeText(context, info, Toast.LENGTH_SHORT).show();
+            } else if (msg.arg1 == Constants.IMPORT_SUCCESS_EVENT) {
+            	Log.i(Constants.APP_TAG, "On IMPORT_SUCCESS_EVENT");
+            	String info = msg.getData().getString("info");
+            	Toast toast = Toast.makeText(context, info, Toast.LENGTH_LONG);
+                toast.setDuration(5);
+                toast.show();
+            	
+            } else if (msg.arg1 == Constants.IMPORT_ERROR_EVENT) {
+            	Log.i(Constants.APP_TAG, "On IMPORT_ERROR_EVENT");
+            	String info = msg.getData().getString("info");
+            	Toast toast = Toast.makeText(context, info, Toast.LENGTH_LONG);
+                toast.setDuration(3);
+                toast.show();
+            }
+        }  
+    }  
 }

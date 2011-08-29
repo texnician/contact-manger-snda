@@ -15,9 +15,12 @@ package com.snda.ContactManager;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.content.ContentUris;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -76,9 +79,23 @@ public class ContactDetail extends Activity implements View.OnClickListener {
 		Intent intent = getIntent();
 		selectedId = intent.getIntExtra(Constants.SELECTED_CONTACT_ID, 0);
 		displayName = intent.getStringExtra(Constants.DISPLAY_NAME);
-		
-		Log.i(Constants.APP_TAG, "Start activity with selectedId =" + selectedId + ", display Name =" + displayName);
-
+        if (selectedId != 0) {
+            Log.i(Constants.APP_TAG, "Start activity with selectedId =" + selectedId + ", display Name =" + displayName);
+        }
+        else {
+            Uri data = intent.getData();
+            String authority = data.getAuthority();
+            Uri lookupUri = null;
+            if (ContactsContract.AUTHORITY.equals(authority)) {
+                lookupUri = data;
+            } else if (android.provider.Contacts.AUTHORITY.equals(authority)) {
+                final long rawContactId = ContentUris.parseId(data);
+                lookupUri = RawContacts.getContactLookupUri(getContentResolver(),
+                                                             ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId));
+            }
+            selectedId = (int) ContentUris.parseId(lookupUri);
+            Log.i(Constants.APP_TAG, "Start activity by VIEW intent with selectedId = " + selectedId + " uri: " + lookupUri.toString());
+        }
         // 显示人物信息
 		ContactManagerApplication application = (ContactManagerApplication)getApplication();
         person = application.getContactManager().makePerson(this, getContentResolver(), selectedId);

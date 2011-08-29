@@ -33,7 +33,10 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds;
 import android.util.Log;
@@ -647,7 +650,7 @@ public class ContactManager {
         // }
     }
 
-    public String exportContacts(Context context, ContentResolver resolver, String filename)
+    public String exportContacts(Context context, ContentResolver resolver, Handler taskHandler, String filename)
     {
         Log.i(Constants.APP_TAG, "Exporting all contacts to " + filename);
 
@@ -655,7 +658,14 @@ public class ContactManager {
     	File dataFile = new File(Environment.getExternalStorageDirectory(), filename);
         // 检查SD卡是否可用
     	if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-    		Toast.makeText(context, context.getString(R.string.bad_sdcard), Toast.LENGTH_SHORT).show();
+    		Log.e(Constants.APP_TAG, "Bad SD card!");
+    		// 给主线程发送消息
+    		Message message = taskHandler.obtainMessage();  
+            message.arg1 = Constants.EXPORT_ERROR_EVENT;
+            Bundle info = new Bundle();
+            info.putString("info", context.getString(R.string.bad_sdcard));
+            message.setData(info);
+            message.sendToTarget();  
     		return "";
     	}
 
@@ -696,13 +706,17 @@ public class ContactManager {
                 // <person>
                 xmlSerializer.startTag("", "person");
                 // <first_name></first_name>
-                xmlSerializer.startTag("", "first_name");  
-                xmlSerializer.text(person.getFirstName());  
+                xmlSerializer.startTag("", "first_name");
+                if (person.getFirstName() != null) {
+                    xmlSerializer.text(person.getFirstName());
+                }
                 xmlSerializer.endTag("", "first_name");
 
                 // <last_name></last_name>
-                xmlSerializer.startTag("", "last_name");  
-                xmlSerializer.text(person.getLastName());  
+                xmlSerializer.startTag("", "last_name");
+                if (person.getLastName() != null) {
+                    xmlSerializer.text(person.getLastName());
+                }
                 xmlSerializer.endTag("", "last_name");  
 
                 // <phone>
@@ -731,46 +745,62 @@ public class ContactManager {
 
                 // <weibo>
                 xmlSerializer.startTag("", "weibo");
-                xmlSerializer.text(person.getWeibo());
+                if (person.getWeibo() != null) {
+                    xmlSerializer.text(person.getWeibo());
+                }
                 xmlSerializer.endTag("", "weibo");
                 // </weibo>
 
                 // <qq>
                 xmlSerializer.startTag("", "qq");
-                xmlSerializer.text(person.getQQ());
+                if (person.getQQ() != null) {
+                    xmlSerializer.text(person.getQQ());
+                }
                 // <qq>
                 xmlSerializer.endTag("", "qq");
 
                 // <msn>
                 xmlSerializer.startTag("", "msn");
-                xmlSerializer.text(person.getMSN());
+                if (person.getMSN() != null) {
+                    xmlSerializer.text(person.getMSN());
+                }
                 // </msn>
                 xmlSerializer.endTag("", "msn");
 
                 // <organization>
                 xmlSerializer.startTag("", "organization");
-                xmlSerializer.text(person.getOrg());
+                if (person.getOrg() != null) {
+                    xmlSerializer.text(person.getOrg());
+                }
                 xmlSerializer.endTag("", "organization");
                 // </organization>
 
                 // department
                 xmlSerializer.startTag("", "department");
-                xmlSerializer.text(person.getDepartment());
+                if (person.getDepartment() != null) {
+                    xmlSerializer.text(person.getDepartment());
+                }
                 xmlSerializer.endTag("", "department");
 
                 // position
                 xmlSerializer.startTag("", "position");
-                xmlSerializer.text(person.getPosition());
+                if (person.getPosition() != null) {
+                    xmlSerializer.text(person.getPosition());
+                }
                 xmlSerializer.endTag("", "position");
 
                 // address
                 xmlSerializer.startTag("", "address");
-                xmlSerializer.text(person.getAddress());
+                if (person.getAddress() != null) {
+                    xmlSerializer.text(person.getAddress());
+                }
                 xmlSerializer.endTag("", "address");
 
                 // note
                 xmlSerializer.startTag("", "note");
-                xmlSerializer.text(person.getNote());
+                if (person.getNote() != null) {
+                    xmlSerializer.text(person.getNote());
+                }
                 xmlSerializer.endTag("", "note");
 
                 xmlSerializer.endTag("", "person");
@@ -779,7 +809,15 @@ public class ContactManager {
             
             xmlSerializer.endDocument();  
         } catch (Exception e) {  
-            // TODO Auto-generated catch block  
+            // TODO Auto-generated catch block
+        	Log.e(Constants.APP_TAG, "Serialize XML failed!");
+        	// 给主线程发送消息
+    		Message message = taskHandler.obtainMessage();  
+            message.arg1 = Constants.EXPORT_ERROR_EVENT;
+            Bundle bd = new Bundle();
+            bd.putString("info", "Serialize XML failed!");
+            message.setData(bd);
+            message.sendToTarget();  
             e.printStackTrace();  
         }
         Log.i(Constants.APP_TAG, xmlWriter.toString());
@@ -790,32 +828,39 @@ public class ContactManager {
         OutputStream outStream;  
         try {
         	outStream = new FileOutputStream(dataFile, false);
+        	// outStream = context.openFileOutput(filename, 0);
             OutputStreamWriter outStreamWriter = new OutputStreamWriter(outStream); 
             outStreamWriter.write(contactsXml);
             outStreamWriter.close();  
             outStream.close();  
         } catch (Exception e) {  
-            e.printStackTrace();  
+            e.printStackTrace();
+            return null;
         }
         
         Log.i(Constants.APP_TAG, "Successfully export " + personList.size() + " contacts to file "
         	  + dataFile.getAbsolutePath());
         
-        Toast.makeText(context, context.getString(R.string.success_exported), Toast.LENGTH_SHORT).show();
+        Message message = taskHandler.obtainMessage();  
+        message.arg1 = Constants.EXPORT_ERROR_EVENT;
+        Bundle bd = new Bundle();
+        bd.putString("info", "成功备份了 " + personList.size() + " 个联系人到 " + dataFile.getAbsolutePath());
+        message.setData(bd);
+        message.sendToTarget();
         
         return dataFile.getAbsolutePath();
     }
 
     // 导入联系人
-    public void importContacts(Context context, ContentResolver resolver, String filename)
+    public void importContacts(Context context, ContentResolver resolver, Handler taskHandler, String filename)
     {
     	Log.i(Constants.APP_TAG, "Importing contacts from " + filename);
 
-        ArrayList<Person> personList = readContactsFromFile(context, filename);
+        ArrayList<Person> personList = readContactsFromFile(context, taskHandler, filename);
 
         if (personList != null) {
             for (Person person : personList) {
-                addContact(new AddContactParameter(context, resolver, 
+                addContact(new AddContactParameter(context, resolver,
                 		                           person.getFirstName(), person.getLastName(),
                 		                           2, (person.getPhoneList().isEmpty() ? "" : person.getPhoneList().get(0)),
                 		                           (person.getMailList().isEmpty() ? "" : person.getMailList().get(0)),
@@ -829,20 +874,37 @@ public class ContactManager {
                 		                           person.getNote()));
             }
             Log.i(Constants.APP_TAG, "Imported " + personList.size() + " contacts");
-            Toast.makeText(context, context.getString(R.string.success_imported), Toast.LENGTH_SHORT).show();
+            
+            Message message = taskHandler.obtainMessage();  
+            message.arg1 = Constants.IMPORT_SUCCESS_EVENT;
+            Bundle bd = new Bundle();
+            bd.putString("info", "成功导入了 " + personList.size() + " 个联系人 ");
+            message.setData(bd);
+            message.sendToTarget();
         }
         else {
         	Log.e(Constants.APP_TAG, "Imported 0 contacts");
+        	Message message = taskHandler.obtainMessage();  
+            message.arg1 = Constants.IMPORT_ERROR_EVENT;
+            Bundle bd = new Bundle();
+            bd.putString("info", "导入联系人失败!");
+            message.setData(bd);
+            message.sendToTarget();
         }
     }
         
-    private ArrayList<Person> readContactsFromFile(Context context, String filename) {
+    private ArrayList<Person> readContactsFromFile(Context context, Handler taskHandler, String filename) {
     	
     	// 获取文件地址
     	File dataFile = new File(Environment.getExternalStorageDirectory(), filename);
         // 检查SD卡是否可用
     	if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-    		Toast.makeText(context, context.getString(R.string.bad_sdcard), Toast.LENGTH_SHORT).show();
+    		Message message = taskHandler.obtainMessage();  
+            message.arg1 = Constants.IMPORT_ERROR_EVENT;
+            Bundle bd = new Bundle();
+            bd.putString("info", context.getString(R.string.bad_sdcard));
+            message.setData(bd);
+            message.sendToTarget();
     		return null;
     	}
     	
@@ -852,7 +914,12 @@ public class ContactManager {
             inputStream = new FileInputStream(dataFile);
         } catch (Exception e) { 
             e.printStackTrace();
-            Toast.makeText(context, context.getString(R.string.open_import_file_error), Toast.LENGTH_SHORT).show();
+            Message message = taskHandler.obtainMessage();  
+            message.arg1 = Constants.IMPORT_ERROR_EVENT;
+            Bundle bd = new Bundle();
+            bd.putString("info", context.getString(R.string.open_import_file_error));
+            message.setData(bd);
+            message.sendToTarget();
             return null;
         }
         
