@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="main">ContactManager main Activity!</string>
-    <string name="app_name">SNDA联系人管理器</string>
+    <string name="app_name">唐亚光ContactManager</string>
     <string name="edit_contact">编辑联系人</string>
     <string name="contact_detail">联系人详细信息</string>
     <string name="label_first_name">名字</string>
